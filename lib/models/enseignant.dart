@@ -2,12 +2,14 @@ class Enseignant {
   final int id;         // This is the ID from the 'enseignants' table
   final String nom;
   final String prenom;
+  final String email;
   final String specialite;
 
   Enseignant({
     required this.id,
     required this.nom,
     required this.prenom,
+    required this.email,
     required this.specialite,
   });
 
@@ -17,6 +19,7 @@ class Enseignant {
       id: int.parse(json['id'].toString()), 
       nom: json['nom'] ?? "",
       prenom: json['prenom'] ?? "",
+      email: json['email'] ?? "",
       specialite: json['specialite'] ?? "",
     );
   }
