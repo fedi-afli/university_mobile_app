@@ -8,7 +8,9 @@ import 'package:projet_mobile/screens/admin/etudiants_screen.dart';
 import 'package:projet_mobile/screens/admin/seances_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
-  const AdminHomeScreen({super.key});
+final int initialIndex;
+  const AdminHomeScreen({super.key, this.initialIndex = 0});
+
 
   @override
   State<AdminHomeScreen> createState() => _AdminHomeScreen();
@@ -25,7 +27,7 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    selectedIndex = 0;
+    selectedIndex = widget.initialIndex; 
     etudiantsScreen = EtudiantsScreen();
     enseignantsScreen = EnseignantsScreen();
     classesScreen = ClassesScreen();
@@ -77,7 +79,7 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
 
   @override
   void dispose() {
-    print("dispose appelé");
+    
     super.dispose();
   }
 }

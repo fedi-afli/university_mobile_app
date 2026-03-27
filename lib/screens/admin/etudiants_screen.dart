@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:projet_mobile/config/api_config.dart';
 import 'package:projet_mobile/models/etudiant.dart';
+import 'package:projet_mobile/models/classe.dart';
+import 'package:projet_mobile/screens/admin/classes_screen.dart';
 
 class EtudiantsScreen extends StatefulWidget {
   const EtudiantsScreen({Key? key}) : super(key: key);
@@ -171,7 +173,12 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
   late TextEditingController nomController;
   late TextEditingController prenomController;
   late TextEditingController classeController;
-  
+  late TextEditingController checkpasswordController;
+  late bool hidden;
+  late bool hidden2;
+  late String? classe_selectioner;
+  late List<Classe> classesList = [];
+ 
 
   @override
   void initState() {
@@ -181,135 +188,248 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
     nomController = TextEditingController();
     prenomController = TextEditingController();
     classeController = TextEditingController();
-    
-    
+    checkpasswordController = TextEditingController();
+    hidden = true;
+    hidden2 = true;
+
+
+    classe_selectioner = null;
+    classes();
   }
+
+  Future<void> classes() async {
+    try {
+      List<Classe> data = await getclasses();
+      setState(() {
+        classesList = data;
+        // Turn off the loading spinner
+      });
+    } catch (e) {
+      print("Error loading classes");
+  
+    }
+  }
+
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    
     // TODO: implement build
 
-
     return Scaffold(
-      appBar: AppBar(title: const Text("ScholarCheck")),
-      body:
-       Center(
-        child: Padding(padding: const EdgeInsets.all(10),
-       child: Form(
-          key: _formKey,
-          child: Column(
-            
-            crossAxisAlignment: CrossAxisAlignment.center,
-           children: [
-            SizedBox(height: 50,),
-    TextFormField(
-      controller: nomController,
-      validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Ce champ est obligatoire'; // The error message shown to the user
-          }
-          return null; // Returning null means "No errors, it's valid!"
-        },
-      decoration: const InputDecoration(labelText: "nom"),
-    ),
-
-    TextFormField(
-      controller: prenomController,
-      validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Ce champ est obligatoire'; // The error message shown to the user
-          }
-          return null; // Returning null means "No errors, it's valid!"
-        },
-      decoration: const InputDecoration(labelText: "prenom"),
-    ),
-
-    TextFormField(
-    validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Ce champ est obligatoire'; // The error message shown to the user
-          }
-          return null; // Returning null means "No errors, it's valid!"
-        },
-      controller: emailController,
-      decoration: const InputDecoration(labelText: "email"),
-    ),
-
-    TextFormField(
-      validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Ce champ est obligatoire'; // The error message shown to the user
-          }
-          return null; // Returning null means "No errors, it's valid!"
-        },
-      controller: passwordController,
-      decoration: const InputDecoration(labelText: "password"),
-    ),
-    TextFormField(
-      validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Ce champ est obligatoire'; // The error message shown to the user
-          }
-          return null; // Returning null means "No errors, it's valid!"
-        },
-      controller: classeController,
-      decoration: const InputDecoration(labelText: "password"),
-    ),
-
-    
-
-    Center(
-      child: ElevatedButton(
-        onPressed: () async {
-          if (_formKey.currentState!.validate()) {
-            var url = Uri.parse("$baseUrl/admin/etudiants.php");
-
-            try {
-              var response = await http.post(
-                url,
-                body: {
-                  "nom": nomController.text,
-                  "prenom": prenomController.text,
-                  "email": emailController.text.trim(),
-                  "password": passwordController.text,
-                  "role": "etudiant",
-                  "classe_id":classeController.text,
-                },
-              );
-
-              var data = json.decode(response.body);
-
-              if (data['success'] == 1) {
-                Navigator.pop(context);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(data['message'])),
-                );
-              }
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("erreur: cannot connect to server "),
-                ),
-              );
-            }
-          } else {
-            print("Erreur : Le champ est vide.");
-          }
-        },
-        child: const Text("Ajouter étudiant"),
-      ),
-    ),
-  ],
-           
-
+      appBar: AppBar(
+        title: const Text("ScholarCheck"),
+        leading: 
+          IconButton(
+            onPressed: () =>
+                Navigator.pushReplacementNamed(context, "/admin_home",arguments: 0),
+            icon: const Icon(Icons.logout),
           ),
-           
+        
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                 Text(
+                "Ajouter un etudiant",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+               
+                SizedBox(height: 50),
+                TextFormField(
+                  controller: nomController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                  decoration: const InputDecoration(labelText: "nom"),
+                ),
+                SizedBox(height: 20),
+
+                TextFormField(
+                  controller: prenomController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                  decoration: const InputDecoration(labelText: "prenom"),
+                ),
+                SizedBox(height: 20),
+
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: "email"),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: TextFormField(
+                        obscureText: hidden,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ce champ est obligatoire'; // The error message shown to the user
+                          }
+                          if (value.length < 6) {
+                            return 'password doit contenir au moins 6 caractères';
+                          }
+                          return null; // Returning null means "No errors, it's valid!"
+                        },
+                        controller: passwordController,
+                        decoration: InputDecoration(
+                          labelText: "password",
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              hidden ? Icons.visibility_off : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                hidden = !hidden;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(flex: 2, child: SizedBox(width: 50)),
+
+                    Expanded(
+                      flex: 5,
+                      child: TextFormField(
+                        obscureText: hidden2,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ce champ est obligatoire'; // The error message shown to the user
+                          } else if (value != passwordController.text) {
+                            return 'pas le meme password';
+                          }
+                          return null; // Returning null means "No errors, it's valid!"
+                        },
+                        controller: checkpasswordController,
+                        decoration: InputDecoration(
+                          labelText: "verifier password",
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              hidden2 ? Icons.visibility_off : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                hidden2 = !hidden2;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+
+                Expanded(
+                  flex: 5,
+                  child: DropdownButtonFormField<String>(
+                    value: classe_selectioner, // Initially null
+                    decoration: const InputDecoration(labelText: "Classe"),
+                    validator: (value) {
+                      if (value == null) return "Veuillez choisir une classe";
+                      return null;
+                    },
+                    items: classesList.map<DropdownMenuItem<String>>((c) {
+                      return DropdownMenuItem<String>(
+                        value: c.id.toString(),
+                        child: Text(c.nom),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        classe_selectioner = value;
+                      });
+                    },
+                  ),
+                ),
+
+                SizedBox(height: 25),
+
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        var url = Uri.parse("$baseUrl/admin/etudiants.php");
+
+                        try {
+                          var response = await http.post(
+                            url,
+                            body: {
+                              "nom": nomController.text,
+                              "prenom": prenomController.text,
+                              "email": emailController.text.trim(),
+                              "password": passwordController.text,
+                              "role": "etudiant",
+                              "classe_id": classe_selectioner,
+                            },
+                          );
+
+                          var data = json.decode(response.body);
+
+                          if (data['success'] == 1) {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/admin_home',
+                              arguments: 0, // 1 = Enseignants tab
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(data['message'])),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "erreur: cannot connect to server ",
+                              ),
+                            ),
+                          );
+                        }
+                      } else {
+                        print("Erreur : Le champ est vide.");
+                      }
+                    },
+                    child: const Text("Ajouter étudiant"),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-       )
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

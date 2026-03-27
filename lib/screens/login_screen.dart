@@ -81,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushReplacementNamed(
                             context,
                             '/admin_home',
-                            arguments: d
+                            arguments: 0
                           );
                         } else if (role == 'enseignant') {
                           Navigator.pushReplacementNamed(
