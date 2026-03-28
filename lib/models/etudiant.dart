@@ -5,6 +5,7 @@ class Etudiant {
   final String email;
   final String classe;
   final String password;
+  final String idc;
 
   Etudiant({
     required this.id,
@@ -12,7 +13,8 @@ class Etudiant {
     required this.prenom,
     required this.email,
     required this.classe,
-    required this.password
+    required this.password,
+    required this.idc
   });
 
   factory Etudiant.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class Etudiant {
       email: json['email'] ?? "",
       classe: json['classe'] ?? "",
       password: json['password']?? "",
+      idc:  json['idc']?? "",
     );
   }
 }

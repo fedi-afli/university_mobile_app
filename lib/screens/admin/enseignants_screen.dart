@@ -110,23 +110,33 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                         horizontal: 10,
                         vertical: 5,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            Expanded(flex: 1, child: Text("${enseignant.id}")),
-                            Expanded(
-                              flex: 4,
-                              child: Text(
-                                "${enseignant.nom.toUpperCase()} ${enseignant.prenom}",
+                      child: InkWell(
+                        onTap: () => Navigator.pushReplacementNamed(
+                          context,
+                          '/admin_home/modifier_enseignant',
+                          arguments: enseignant,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Text("${enseignant.id}"),
                               ),
-                            ),
-                            Expanded(flex: 4, child: Text(enseignant.email)),
-                            Expanded(
-                              flex: 2,
-                              child: Text("${enseignant.specialite}"),
-                            ),
-                          ],
+                              Expanded(
+                                flex: 4,
+                                child: Text(
+                                  "${enseignant.nom.toUpperCase()} ${enseignant.prenom}",
+                                ),
+                              ),
+                              Expanded(flex: 4, child: Text(enseignant.email)),
+                              Expanded(
+                                flex: 2,
+                                child: Text("${enseignant.specialite}"),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -147,7 +157,6 @@ Future<List<Enseignant>> getdata() async {
   if (response.statusCode == 200) {
     var data = json.decode(response.body);
     if (data['success'] == 1) {
-      // 2. CONVERT THE JSON LIST TO A LIST OF enseignant OBJECTS
       List<dynamic> jsonList = data['data'];
       return jsonList.map((json) => Enseignant.fromJson(json)).toList();
     }
@@ -197,14 +206,14 @@ class _AjouterEnseignantState extends State<AjouterEnseignant> {
       appBar: AppBar(
         title: const Text("ScholarCheck"),
         automaticallyImplyLeading: false,
-        leading: 
-          
-          IconButton(
-            onPressed: () =>
-                Navigator.pushReplacementNamed(context, "/admin_home", arguments: 1,),
-            icon: const Icon(Icons.arrow_back),
+        leading: IconButton(
+          onPressed: () => Navigator.pushReplacementNamed(
+            context,
+            "/admin_home",
+            arguments: 1,
           ),
-        
+          icon: const Icon(Icons.arrow_back),
+        ),
       ),
       body: Center(
         child: Padding(
@@ -360,11 +369,11 @@ class _AjouterEnseignantState extends State<AjouterEnseignant> {
                           var data = json.decode(response.body);
 
                           if (data['success'] == 1) {
-                          Navigator.pushReplacementNamed(
+                            Navigator.pushReplacementNamed(
                               context,
                               '/admin_home',
                               arguments: 1, // 1 = Enseignants tab
-                            ); 
+                            );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(data['message'])),
@@ -383,7 +392,258 @@ class _AjouterEnseignantState extends State<AjouterEnseignant> {
                         print("Erreur : Le champ est vide.");
                       }
                     },
-                    child: const Text("Ajouter enseignant"),
+                    child: const Text("Ajouter"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ModifierEnseignant extends StatefulWidget {
+  final Enseignant selectionner;
+
+  const ModifierEnseignant({super.key, required this.selectionner});
+
+  @override
+  _ModifierEnseignantState createState() => _ModifierEnseignantState();
+}
+
+class _ModifierEnseignantState extends State<ModifierEnseignant> {
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+  late TextEditingController nomController;
+  late TextEditingController prenomController;
+  late TextEditingController checkpasswordController;
+  late TextEditingController specialiter;
+  late bool hidden;
+  late bool hidden2;
+  late Enseignant selected;
+
+  @override
+  void initState() {
+    super.initState();
+
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+    nomController = TextEditingController();
+    prenomController = TextEditingController();
+    specialiter = TextEditingController();
+    checkpasswordController = TextEditingController();
+
+    selected = widget.selectionner;
+    emailController.text = selected.email;
+    passwordController = TextEditingController();
+    nomController.text = selected.nom;
+    prenomController.text = selected.prenom;
+    checkpasswordController = TextEditingController();
+    specialiter.text = selected.specialite;
+    hidden = true;
+    hidden2 = true;
+  }
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("ScholarCheck"),
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          onPressed: () => Navigator.pushReplacementNamed(
+            context,
+            "/admin_home",
+            arguments: 1,
+          ),
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Modifier enseignant",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+
+                SizedBox(height: 50),
+                TextFormField(
+                  controller: nomController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                  decoration: const InputDecoration(labelText: "nom"),
+                ),
+                SizedBox(height: 20),
+
+                TextFormField(
+                  controller: prenomController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                  decoration: const InputDecoration(labelText: "prenom"),
+                ),
+                SizedBox(height: 20),
+
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: "email"),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: TextFormField(
+                        obscureText: hidden,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ce champ est obligatoire'; // The error message shown to the user
+                          }
+                          if (value.length < 6) {
+                            return 'password doit contenir au moins 6 caractères';
+                          }
+                          return null; // Returning null means "No errors, it's valid!"
+                        },
+                        controller: passwordController,
+                        decoration: InputDecoration(
+                          labelText: "password",
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              hidden ? Icons.visibility_off : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                hidden = !hidden;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(flex: 2, child: SizedBox(width: 50)),
+
+                    Expanded(
+                      flex: 5,
+                      child: TextFormField(
+                        obscureText: hidden2,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ce champ est obligatoire'; // The error message shown to the user
+                          } else if (value != passwordController.text) {
+                            return 'pas le meme password';
+                          }
+                          return null; // Returning null means "No errors, it's valid!"
+                        },
+                        controller: checkpasswordController,
+                        decoration: InputDecoration(
+                          labelText: "verifier password",
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              hidden2 ? Icons.visibility_off : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                hidden2 = !hidden2;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+
+                TextFormField(
+                  controller: specialiter,
+                  decoration: const InputDecoration(labelText: "specialiter"),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                ),
+
+                SizedBox(height: 25),
+
+                Center(
+                  child: ElevatedButton(
+                    
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        var url = Uri.parse("$baseUrl/admin/enseignants.php");
+
+                        try {
+                          var response = await http.put(
+                            url,
+                            body: {
+                              "nom": nomController.text,
+                              "prenom": prenomController.text,
+                              "email": emailController.text.trim(),
+                              "password": passwordController.text,
+                              "id": selected.id.toString(),
+                              "specialite": specialiter.text,
+                            },
+                          );
+
+                          var data = json.decode(response.body);
+
+                          if (data['success'] == 1) {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/admin_home',
+                              arguments: 1, // 1 = Enseignants tab
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(data['message'])),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "erreur: cannot connect to server ",
+                              ),
+                            ),
+                          );
+                        }
+                      } else {
+                        print("Erreur : Le champ est vide.");
+                      }
+                    },
+                    child: const Text("Modifier"),
                   ),
                 ),
               ],

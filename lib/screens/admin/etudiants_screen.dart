@@ -104,24 +104,36 @@ class _EtudiantsScreenState extends State<EtudiantsScreen> {
                         horizontal: 10,
                         vertical: 5,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            // These must match the flex values in the header perfectly!
-                            Expanded(flex: 1, child: Text("${etudiant.id}")),
-                            Expanded(
-                              flex: 4,
-                              child: Text(
-                                "${etudiant.nom.toUpperCase()} ${etudiant.prenom}",
+                      child: InkWell(
+                        onTap: () {
+                          // TODO: Add your click action here!
+                          // Example: Navigate to a details screen
+                          Navigator.pushReplacementNamed(
+                            context,
+                            '/admin_home/modifier_etudiant',
+                            arguments: etudiant,
+                          );
+                        },
+
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              // These must match the flex values in the header perfectly!
+                              Expanded(flex: 1, child: Text("${etudiant.id}")),
+                              Expanded(
+                                flex: 4,
+                                child: Text(
+                                  "${etudiant.nom.toUpperCase()} ${etudiant.prenom}",
+                                ),
                               ),
-                            ),
-                            Expanded(flex: 4, child: Text(etudiant.email)),
-                            Expanded(
-                              flex: 2,
-                              child: Text(etudiant.classe ?? 'N/A'),
-                            ),
-                          ],
+                              Expanded(flex: 4, child: Text(etudiant.email)),
+                              Expanded(
+                                flex: 2,
+                                child: Text(etudiant.classe ?? 'N/A'),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -178,7 +190,6 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
   late bool hidden2;
   late String? classe_selectioner;
   late List<Classe> classesList = [];
- 
 
   @override
   void initState() {
@@ -191,7 +202,6 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
     checkpasswordController = TextEditingController();
     hidden = true;
     hidden2 = true;
-
 
     classe_selectioner = null;
     classes();
@@ -206,7 +216,6 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
       });
     } catch (e) {
       print("Error loading classes");
-  
     }
   }
 
@@ -219,13 +228,14 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("ScholarCheck"),
-        leading: 
-          IconButton(
-            onPressed: () =>
-                Navigator.pushReplacementNamed(context, "/admin_home",arguments: 0),
-            icon: const Icon(Icons.logout),
+        leading: IconButton(
+          onPressed: () => Navigator.pushReplacementNamed(
+            context,
+            "/admin_home",
+            arguments: 0,
           ),
-        
+          icon: const Icon(Icons.arrow_back),
+        ),
       ),
       body: Center(
         child: Padding(
@@ -235,16 +245,16 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                 Text(
-                "Ajouter un etudiant",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                  fontStyle: FontStyle.italic,
+                Text(
+                  "Ajouter un etudiant",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
-              ),
-               
+
                 SizedBox(height: 50),
                 TextFormField(
                   controller: nomController,
@@ -346,9 +356,7 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
                 ),
                 SizedBox(height: 20),
 
-                Expanded(
-                  flex: 5,
-                  child: DropdownButtonFormField<String>(
+                 DropdownButtonFormField<String>(
                     value: classe_selectioner, // Initially null
                     decoration: const InputDecoration(labelText: "Classe"),
                     validator: (value) {
@@ -366,10 +374,10 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
                         classe_selectioner = value;
                       });
                     },
-                  ),
+                  
                 ),
 
-                SizedBox(height: 25),
+                SizedBox(height: 30),
 
                 Center(
                   child: ElevatedButton(
@@ -416,7 +424,289 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
                         print("Erreur : Le champ est vide.");
                       }
                     },
-                    child: const Text("Ajouter étudiant"),
+                    child: const Text("Ajouter"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+}
+
+class ModifierEtudiant extends StatefulWidget {
+  final Etudiant selectionner;
+
+  const ModifierEtudiant({super.key, required this.selectionner});
+
+  @override
+  _ModifierEtudiantState createState() => _ModifierEtudiantState();
+}
+
+class _ModifierEtudiantState extends State<ModifierEtudiant> {
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+  late TextEditingController nomController;
+  late TextEditingController prenomController;
+  late TextEditingController classeController;
+  late TextEditingController checkpasswordController;
+  late bool hidden;
+  late bool hidden2;
+  late String? classe_selectioner;
+  late List<Classe> classesList = [];
+  late Etudiant selectedEtudient;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedEtudient = widget.selectionner;
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+    nomController = TextEditingController();
+    prenomController = TextEditingController();
+    classeController = TextEditingController();
+    checkpasswordController = TextEditingController();
+    hidden = true;
+    hidden2 = true;
+
+    emailController.text = selectedEtudient.email;
+    passwordController = TextEditingController();
+    nomController.text = selectedEtudient.nom;
+    prenomController.text = selectedEtudient.prenom;
+    checkpasswordController = TextEditingController();
+
+    classe_selectioner = selectedEtudient.idc.toString();
+    classes();
+  }
+
+  Future<void> classes() async {
+    try {
+      List<Classe> data = await getclasses();
+      setState(() {
+        classesList = data;
+        // Turn off the loading spinner
+      });
+    } catch (e) {
+      print("Error loading classes");
+    }
+  }
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("ScholarCheck"),
+        leading: IconButton(
+          onPressed: () => Navigator.pushReplacementNamed(
+            context,
+            "/admin_home",
+            arguments: 0,
+          ),
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Modifier un etudiant",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+
+                SizedBox(height: 50),
+                TextFormField(
+                  controller: nomController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                  decoration: const InputDecoration(labelText: "nom"),
+                ),
+                SizedBox(height: 20),
+
+                TextFormField(
+                  controller: prenomController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                  decoration: const InputDecoration(labelText: "prenom"),
+                ),
+                SizedBox(height: 20),
+
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ce champ est obligatoire'; // The error message shown to the user
+                    }
+                    return null; // Returning null means "No errors, it's valid!"
+                  },
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: "email"),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: TextFormField(
+                        obscureText: hidden,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ce champ est obligatoire'; // The error message shown to the user
+                          }
+                          if (value.length < 6) {
+                            return 'password doit contenir au moins 6 caractères';
+                          }
+                          return null; // Returning null means "No errors, it's valid!"
+                        },
+                        controller: passwordController,
+                        decoration: InputDecoration(
+                          labelText: "password",
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              hidden ? Icons.visibility_off : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                hidden = !hidden;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(flex: 2, child: SizedBox(width: 50)),
+
+                    Expanded(
+                      flex: 5,
+                      child: TextFormField(
+                        obscureText: hidden2,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ce champ est obligatoire'; // The error message shown to the user
+                          } else if (value != passwordController.text) {
+                            return 'pas le meme password';
+                          }
+                          return null; // Returning null means "No errors, it's valid!"
+                        },
+                        controller: checkpasswordController,
+                        decoration: InputDecoration(
+                          labelText: "verifier password",
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              hidden2 ? Icons.visibility_off : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                hidden2 = !hidden2;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+
+                
+                  
+                   DropdownButtonFormField<String>(
+                    value: classe_selectioner,
+                    decoration: const InputDecoration(labelText: "Classe"),
+                    validator: (value) {
+                      if (value == null) return "Veuillez choisir une classe";
+                      return null;
+                    },
+                    items: classesList.map<DropdownMenuItem<String>>((c) {
+                      return DropdownMenuItem<String>(
+                        value: c.id.toString(),
+                        child: Text(c.nom),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        classe_selectioner = value;
+                      });
+                    },
+                  ),
+                
+
+                SizedBox(height: 30),
+
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        var url = Uri.parse("$baseUrl/admin/etudiants.php");
+
+                        try {
+                          var response = await http.put(
+                            url,
+                            body: {
+                              "id": selectedEtudient.id.toString(),
+                              "nom": nomController.text,
+                              "prenom": prenomController.text,
+                              "email": emailController.text.trim(),
+                              "password": passwordController.text,
+                              "classe_id": classe_selectioner,
+                            },
+                          );
+
+                          var data = json.decode(response.body);
+
+                          if (data['success'] == 1) {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/admin_home',
+                              arguments: 0, // 1 = Enseignants tab
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(data['message'])),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "erreur: cannot connect to server ",
+                              ),
+                            ),
+                          );
+                        }
+                      } else {
+                        print("Erreur : Le champ est vide.");
+                      }
+                    },
+                    child: const Text("Modifier"),
                   ),
                 ),
               ],
