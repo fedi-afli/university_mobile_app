@@ -46,7 +46,7 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                   ),
                 ),
                 Expanded(
-                  flex: 4,
+                  flex: 2,
                   child: Text(
                     "Nom & Prénom",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -60,7 +60,7 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                   ),
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: Text(
                     "specialite",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -125,14 +125,14 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                                 child: Text("${enseignant.id}"),
                               ),
                               Expanded(
-                                flex: 4,
+                                flex: 2,
                                 child: Text(
                                   "${enseignant.nom.toUpperCase()} ${enseignant.prenom}",
                                 ),
                               ),
                               Expanded(flex: 4, child: Text(enseignant.email)),
                               Expanded(
-                                flex: 2,
+                                flex: 3,
                                 child: Text("${enseignant.specialite}"),
                               ),
                             ],

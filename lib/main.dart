@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_mobile/models/enseignant.dart';
 import 'package:projet_mobile/screens/admin/enseignants_screen.dart';
+import 'package:projet_mobile/screens/admin/seances_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin/admin_home.dart';
 import 'screens/admin/etudiants_screen.dart';
@@ -78,6 +79,7 @@ class MyApp extends StatelessWidget {
           
           return ModifierEnseignant(selectionner: args); 
         },
+        "/admin_home/Formulaire_affectation": (context) => const AjouterSeance(),
       },
     );
   }
