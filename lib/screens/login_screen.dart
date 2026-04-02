@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:projet_mobile/config/api_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     emailController = TextEditingController();
     passwordController = TextEditingController();
+    
   }
 
   @override
@@ -70,30 +72,39 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       );
 
-                      // 3. Decode the JSON response
+                      
                       var data = json.decode(response.body);
 
                       if (data['success'] == 1) {
+                        
                         String role = data['data'][0]['role'];
-                        var d = data['data'];
+                        //var d = data['data'];
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                        // 2. Save the user's data locally (THIS IS YOUR "SESSION")
+                        await prefs.setBool('isLoggedIn', true);
+                        await prefs.setString(
+                          'userId',data['data'][0]['id'].toString(),
+                        );
+                        await prefs.setString('userRole', role);
 
                         if (role == 'admin') {
                           Navigator.pushReplacementNamed(
                             context,
                             '/admin_home',
-                            arguments: 0
+                            arguments: 0,
                           );
                         } else if (role == 'enseignant') {
                           Navigator.pushReplacementNamed(
                             context,
                             '/enseignant_home',
-                             arguments: d
+                           
                           );
                         } else {
                           Navigator.pushReplacementNamed(
                             context,
                             '/etudiant_home',
-                             arguments: d
+                       
                           );
                         }
                       } else {
@@ -124,3 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 }
+
+
+

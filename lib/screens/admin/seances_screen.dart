@@ -19,135 +19,184 @@ class SeancesScreen extends StatefulWidget {
 class _SeancesScreenState extends State<SeancesScreen> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // 1. THE HEADER ROW
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 15.0),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+    return Scaffold(
+      body: Column(
+        children: [
+          // 1. THE HEADER ROW
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 22.0,
+              vertical: 15.0,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+            ),
+            child: const Row(
+              children: [
+                // Using Expanded to force column widths!
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    "ID",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "Matiere",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "Classe",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "date",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "debut",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "fin",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "heure",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: const Row(
-            children: [
-              // Using Expanded to force column widths!
-              Expanded(
-                flex: 1,
-                child: Text(
-                  "ID",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Text(
-                  "Matiere",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  "Classe",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  "date",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  "heure",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: FutureBuilder(
-            future: getSeances(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
-              }
+          Expanded(
+            child: FutureBuilder(
+              future: getSeances(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              var list = snapshot.data as List<Seance>;
-              if (list.length == 0) {
-                return Scaffold(
-                  body: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Aucune donnée trouvée",
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                        ],
+                var list = snapshot.data as List<Seance>;
+                if (list.length == 0) {
+                  return Scaffold(
+                    body: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Aucune donnée trouvée",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  floatingActionButton: FloatingActionButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        "/admin_home/Formulaire_affectation",
-                      );
-                    },
-                    tooltip: 'ajouter etudiant',
-                    child: const Icon(Icons.add),
-                  ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    Seance seance = list[index];
+                    DateTime debut = DateTime.parse(
+                      "2000-01-01 ${seance.heureDebut}",
+                    );
+                    DateTime fin = DateTime.parse(
+                      "2000-01-01 ${seance.heureFin}",
+                    );
+                    double difference = fin.difference(debut).inMinutes / 60.0;
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Row(
+                          children: [
+                            Expanded(flex: 1, child: Text("${seance.id}")),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                "${seance.matiere}",
+                                style: TextStyle(fontSize: 9),
+                              ),
+                            ),
+                            Expanded(flex: 2, child: Text(seance.classe)),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                "${seance.dateSeance}",
+                                style: TextStyle(fontSize: 13),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text("${formatTime(seance.heureDebut)}"),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text("${formatTime(seance.heureFin)}"),
+                            ),
+                            Expanded(flex: 2, child: Text("$difference")),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 );
-              }
-
-              return ListView.builder(
-                itemCount: list.length,
-                itemBuilder: (context, index) {
-                  Seance seance = list[index];
-                  DateTime debut = DateTime.parse(
-                    "2000-01-01 ${seance.heureDebut}",
-                  );
-                  DateTime fin = DateTime.parse(
-                    "2000-01-01 ${seance.heureFin}",
-                  );
-                  double difference = fin.difference(debut).inMinutes / 60.0;
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        children: [
-                          Expanded(flex: 1, child: Text("${seance.id}")),
-                          Expanded(flex: 3, child: Text("${seance.matiere}")),
-                          Expanded(flex: 2, child: Text(seance.classe)),
-                          Expanded(
-                            flex: 2,
-                            child: Text("${seance.dateSeance}"),
-                          ),
-                          Expanded(flex: 2, child: Text("$difference")),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushReplacementNamed(
+            context,
+            "/admin_home/Formulaire_affectation",
+          );
+        },
+        tooltip: 'affecter une sceance',
+        child: const Icon(Icons.add),
+      ),
     );
   }
+}
+
+String formatTime(String rawTime) {
+  if (rawTime.isEmpty) return "";
+
+  // 1. If there's a date attached (e.g., "2000-01-01 08:00:00.000"), split and take just the time part
+  String timePart = rawTime.contains(' ') ? rawTime.split(' ')[1] : rawTime;
+
+  // 2. Take only the first 5 characters (HH:MM) and ignore the seconds/milliseconds
+  return timePart.length >= 5 ? timePart.substring(0, 5) : timePart;
 }
 
 Future<List<Seance>> getSeances() async {
@@ -284,7 +333,7 @@ class _AjouterSeanceState extends State<AjouterSeance> {
           onPressed: () => Navigator.pushReplacementNamed(
             context,
             "/admin_home",
-            arguments: 0,
+            arguments: 3,
           ),
           icon: const Icon(Icons.arrow_back),
         ),
@@ -307,7 +356,7 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                   ),
                 ),
 
-                SizedBox(height: 50),
+                SizedBox(height: 30),
 
                 DropdownButtonFormField<String>(
                   value: enseignant_selectioner, // Initially null
@@ -328,7 +377,7 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                     });
                   },
                 ),
-                SizedBox(height: 50),
+                SizedBox(height: 30),
 
                 DropdownButtonFormField<String>(
                   value: matiere_selectioner, // Initially null
@@ -349,6 +398,7 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                     });
                   },
                 ),
+                SizedBox(height: 30),
 
                 DropdownButtonFormField<String>(
                   value: classe_selectioner, // Initially null
@@ -373,7 +423,6 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                 SizedBox(height: 30),
 
                 // ------------------ DATE DE SEANCE ------------------
-                SizedBox(height: 30),
                 TextFormField(
                   controller: dateController,
                   readOnly: true, // Prevents keyboard from opening
@@ -416,6 +465,17 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                   validator: (value) {
                     if (value == null || value.isEmpty)
                       return "Veuillez choisir l'heure de début";
+
+                    if (finController.text.isNotEmpty) {
+                      DateTime debut = DateTime.parse(
+                        "2000-01-01 $value",
+                      );
+                      DateTime fin = DateTime.parse("2000-01-01 ${finController.text}");
+                      if (debut.isAfter(fin)) {
+                        return "temp erroner";
+                      }
+                    }
+
                     return null;
                   },
                 ),
@@ -433,9 +493,20 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                   validator: (value) {
                     if (value == null || value.isEmpty)
                       return "Veuillez choisir l'heure de fin";
+
+                    if (finController.text.isNotEmpty) {
+                      DateTime fin = DateTime.parse(
+                        "2000-01-01 $value",
+                      );
+                      DateTime debut = DateTime.parse("${debutController.text}");
+                      if (debut.isAfter(fin)) {
+                        return "temp erroner";
+                      }
+                    }
                     return null;
                   },
                 ),
+                SizedBox(height: 30),
 
                 Center(
                   child: ElevatedButton(
@@ -462,7 +533,7 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                             Navigator.pushReplacementNamed(
                               context,
                               '/admin_home',
-                              arguments: 0, // 1 = Enseignants tab
+                              arguments: 3,
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(

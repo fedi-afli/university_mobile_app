@@ -6,11 +6,11 @@ import 'package:projet_mobile/screens/admin/classes_screen.dart';
 import 'package:projet_mobile/screens/admin/enseignants_screen.dart';
 import 'package:projet_mobile/screens/admin/etudiants_screen.dart';
 import 'package:projet_mobile/screens/admin/seances_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminHomeScreen extends StatefulWidget {
-final int initialIndex;
+  final int initialIndex;
   const AdminHomeScreen({super.key, this.initialIndex = 0});
-
 
   @override
   State<AdminHomeScreen> createState() => _AdminHomeScreen();
@@ -27,26 +27,53 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    selectedIndex = widget.initialIndex; 
+    selectedIndex = widget.initialIndex;
     etudiantsScreen = EtudiantsScreen();
     enseignantsScreen = EnseignantsScreen();
     classesScreen = ClassesScreen();
     seancesScreen = SeancesScreen();
-    screen = [etudiantsScreen,enseignantsScreen,classesScreen,seancesScreen];
-    
+    screen = [etudiantsScreen, enseignantsScreen, classesScreen, seancesScreen];
   }
-  
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         title: const Text("ScholarCheck"),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            onPressed: () => Navigator.pushReplacementNamed(context, "/"),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Deconnixion'),
+                    content: Text(
+                      "Êtes-vous sûr de vouloir vous déconnecter ?",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text("annuler"),
+                      ),
+
+                      FilledButton(
+                        onPressed: () async {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                            prefs.clear();
+
+                            Navigator.pushReplacementNamed(context, "/");},
+                        child: Text('deconnecter'),
+                      ),
+                    ],
+                  ),
+                );
+
+
+
+              
+            },
             icon: const Icon(Icons.logout),
           ),
         ],
@@ -79,7 +106,6 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
 
   @override
   void dispose() {
-    
     super.dispose();
   }
 }
