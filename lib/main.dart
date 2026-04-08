@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projet_mobile/models/enseignant.dart';
 import 'package:projet_mobile/screens/admin/enseignants_screen.dart';
 import 'package:projet_mobile/screens/admin/seances_screen.dart';
+import 'package:projet_mobile/screens/edudiant/etudiant_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin/admin_home.dart';
@@ -23,33 +24,109 @@ class MyApp extends StatelessWidget {
       title: 'ScholarCheck',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0C9C34), // nice green
+        
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF059669),      // Deep Emerald Green
+          onPrimary: Colors.white,
+          secondary: Color(0xFF2563EB),    // Royal Blue
+          onSecondary: Colors.white,
+          surface: Colors.white,
+          onSurface: Color(0xFF1E293B),    // Dark Slate text
+          background: Color(0xFFF8FAFC),
         ),
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
 
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF0C9C34),
-          foregroundColor: Colors.white, // text/icons white
+          backgroundColor: Color(0xFF059669),
+          foregroundColor: Colors.white,
           centerTitle: true,
+          elevation: 0,
+          titleTextStyle: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
         ),
 
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF0C9C34),
+            backgroundColor: const Color(0xFF059669),
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            minimumSize: Size(120, 30),
+            elevation: 2,
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            minimumSize: const Size(120, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            textStyle: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Color(0xFF0C9C34),
-          selectedItemColor: Color.fromARGB(255, 0, 136, 38),
-          unselectedItemColor: Colors.grey,
+
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF059669), width: 2),
+          ),
+          hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+        ),
+
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
+          selectedItemColor: Color(0xFF059669),
+          unselectedItemColor: Color(0xFF94A3B8), 
           showUnselectedLabels: true,
+          type: BottomNavigationBarType.fixed,
+          elevation: 12,
+          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+        ),
+
+        cardTheme: CardThemeData(
+          color: Colors.white,
+          elevation: 4, // Slightly higher elevation
+          shadowColor: const Color(0xFF059669).withOpacity(0.15), // A subtle emerald-tinted shadow
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(
+              color: Color(0xFFE2E8F0), // Very faint slate border to frame the content
+              width: 1,
+            ),
+          ),
+          clipBehavior: Clip.antiAlias, // Ensures list items don't bleed out of the rounded corners
+        ),
+
+        // 7. NEW: ListTile Theme (Makes the text and icons inside lists look premium)
+        listTileTheme: ListTileThemeData(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8), // Better breathing room
+          iconColor: const Color(0xFF059669), // Makes leading/trailing icons Emerald automatically
+          tileColor: Colors.transparent,
+          titleTextStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600, // Bolder titles for names/classes
+            color: Color(0xFF1E293B),    // Dark slate
+          ),
+          subtitleTextStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF64748B),    // Lighter slate for secondary info
+            height: 1.4,
+          ),
         ),
       ),
-
       initialRoute: '/',
 
       routes: {
@@ -58,36 +135,50 @@ class MyApp extends StatelessWidget {
 
         '/admin_home': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as int?;
-          return AuthGuard(child: AdminHomeScreen(initialIndex: args ?? 0),roleRequired: "admin",) ;
+          return AuthGuard(
+            child: AdminHomeScreen(initialIndex: args ?? 0),
+            roleRequired: "admin",
+          );
         },
-        '/enseignant_home': (context) =>
-            const  AuthGuard(child: Scaffold(body: Center(child: Text("Enseignant Home"))),roleRequired: "enseignant",),
+        '/enseignant_home': (context) => const AuthGuard(
+          child: Scaffold(body: Center(child: Text("Enseignant Home"))),
+          roleRequired: "enseignant",
+        ),
         '/etudiant_home': (context) =>
-            const Scaffold(body: Center(child: Text("Etudiant Home"))),
-        '/admin_home/ajouter_etudiant': (context) =>const AuthGuard(child: AjouterEtudiant(),roleRequired: "admin",)  ,
-        '/admin_home/ajouter_enseignant': (context) =>const AuthGuard(child: AjouterEnseignant(),roleRequired: "admin",)  ,
-            
-        '/admin_home/ajouter_classe': (context) => const AuthGuard(child:  AjouterClass(),roleRequired: "admin",) ,
+             AuthGuard(child: EtudiantHome(), roleRequired: "etudiant"),
+        '/admin_home/ajouter_etudiant': (context) =>
+            const AuthGuard(child: AjouterEtudiant(), roleRequired: "admin"),
+        '/admin_home/ajouter_enseignant': (context) =>
+            const AuthGuard(child: AjouterEnseignant(), roleRequired: "admin"),
+
+        '/admin_home/ajouter_classe': (context) =>
+            const AuthGuard(child: AjouterClass(), roleRequired: "admin"),
         '/admin_home/modifier_etudiant': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Etudiant;
 
-          return  AuthGuard(child: ModifierEtudiant(selectionner: args),roleRequired: "admin",)  ;
+          return AuthGuard(
+            child: ModifierEtudiant(selectionner: args),
+            roleRequired: "admin",
+          );
         },
         '/admin_home/modifier_enseignant': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Enseignant;
 
-          return AuthGuard(child:  ModifierEnseignant(selectionner: args),roleRequired: "admin",)  ;
+          return AuthGuard(
+            child: ModifierEnseignant(selectionner: args),
+            roleRequired: "admin",
+          );
         },
-        "/admin_home/Formulaire_affectation": (context) => AuthGuard(child:  AjouterSeance(),roleRequired: "admin",)
-            
-      } ,
-     /* onGenerateRoute: (settings) {
+        "/admin_home/Formulaire_affectation": (context) =>
+            AuthGuard(child: AjouterSeance(), roleRequired: "admin"),
+      },
+      /* onGenerateRoute: (settings) {
   return MaterialPageRoute(
     builder: (context) => RouteGuard(settings: settings),
         );
       }, */
-          );
-        }
+    );
+  }
 }
 
 class sessionScreen extends StatefulWidget {
@@ -128,18 +219,16 @@ class _sessionScreen extends State<sessionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0C9C34), // Green background
+    return const Scaffold(
+      backgroundColor: Color(0xFF059669), // Updated to Emerald Green
       body: Center(
-        // A nice white loading spinner
-        child: const CircularProgressIndicator(color: Colors.white),
+        child: CircularProgressIndicator(color: Colors.white),
       ),
     );
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 }
@@ -148,11 +237,7 @@ class AuthGuard extends StatelessWidget {
   final Widget child;
   final String? roleRequired;
 
-  const AuthGuard({
-    super.key,
-    required this.child,
-    this.roleRequired,
-  });
+  const AuthGuard({super.key, required this.child, this.roleRequired});
 
   Future<Widget> _checkAccess() async {
     final prefs = await SharedPreferences.getInstance();
@@ -160,19 +245,14 @@ class AuthGuard extends StatelessWidget {
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
     final role = prefs.getString('userRole');
 
-   
     if (!isLoggedIn) {
       return const LoginScreen();
     }
 
-   
     if (roleRequired != null && role != roleRequired) {
-      return const Scaffold(
-        body: Center(child: Text("Unauthorized")),
-      );
+      return const Scaffold(body: Center(child: Text("Unauthorized")));
     }
 
-    
     return child;
   }
 
@@ -183,10 +263,8 @@ class AuthGuard extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0C9C34),
-            body: Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
+            backgroundColor: Color(0xFF059669), // Updated to Emerald Green
+            body: Center(child: CircularProgressIndicator(color: Colors.white)),
           );
         }
         return snapshot.data!;
