@@ -462,17 +462,18 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                     suffixIcon: Icon(Icons.access_time),
                   ),
                   onTap: () => _selectTime(context, debutController),
-                  validator: (value) {
-                    if (value == null || value.isEmpty)
+                 validator: (value) {
+                    if (value == null || value.isEmpty) {
                       return "Veuillez choisir l'heure de début";
+                    }
 
-                    if (finController.text.isNotEmpty) {
-                      DateTime debut = DateTime.parse(
-                        "2000-01-01 $value",
-                      );
+                    // Only compare if finController actually has a selected time
+                    if (finController.text.isNotEmpty && value.isNotEmpty) {
+                      DateTime debut = DateTime.parse("2000-01-01 $value");
                       DateTime fin = DateTime.parse("2000-01-01 ${finController.text}");
+                      
                       if (debut.isAfter(fin)) {
-                        return "temp erroner";
+                        return "Heure de début invalide";
                       }
                     }
 
@@ -480,7 +481,7 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                   },
                 ),
 
-                // ------------------ HEURE DE FIN ------------------
+           
                 SizedBox(height: 30),
                 TextFormField(
                   controller: finController,
@@ -491,20 +492,24 @@ class _AjouterSeanceState extends State<AjouterSeance> {
                   ),
                   onTap: () => _selectTime(context, finController),
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return "Veuillez choisir l'heure de fin";
+                    }
 
-                    if (finController.text.isNotEmpty) {
-                      DateTime fin = DateTime.parse(
-                        "2000-01-01 $value",
-                      );
-                      DateTime debut = DateTime.parse("${debutController.text}");
+                    // Check if BOTH fields have text before comparing
+                    if (debutController.text.isNotEmpty && value.isNotEmpty) {
+                      DateTime fin = DateTime.parse("2000-01-01 $value");
+                      
+                      // THE FIX IS HERE: Added "2000-01-01 " to the debut string
+                      DateTime debut = DateTime.parse("2000-01-01 ${debutController.text}"); 
+                      
                       if (debut.isAfter(fin)) {
-                        return "temp erroner";
+                        return "Heure de fin invalide"; // Better error message
                       }
                     }
                     return null;
                   },
+                
                 ),
                 SizedBox(height: 30),
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projet_mobile/models/enseignant.dart';
 import 'package:projet_mobile/screens/admin/enseignants_screen.dart';
 import 'package:projet_mobile/screens/admin/seances_screen.dart';
+import 'package:projet_mobile/screens/enseignant/enseignant_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin/admin_home.dart';
@@ -61,7 +62,7 @@ class MyApp extends StatelessWidget {
           return AuthGuard(child: AdminHomeScreen(initialIndex: args ?? 0),roleRequired: "admin",) ;
         },
         '/enseignant_home': (context) =>
-            const  AuthGuard(child: Scaffold(body: Center(child: Text("Enseignant Home"))),roleRequired: "enseignant",),
+            const  AuthGuard(child:EnseignantHomeScreen() ,roleRequired: "enseignant",),
         '/etudiant_home': (context) =>
             const Scaffold(body: Center(child: Text("Etudiant Home"))),
         '/admin_home/ajouter_etudiant': (context) =>const AuthGuard(child: AjouterEtudiant(),roleRequired: "admin",)  ,
