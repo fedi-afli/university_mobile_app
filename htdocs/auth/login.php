@@ -32,19 +32,19 @@ if($req){
         array_push($response["data"], $user);
 
         $response["success"] = 1;
-        $response["message"] = "login avec succes ";
+        $response["message"] = "Connexion réussie. Bienvenue ".$user["nom"];
 
 
 
     }else{
             $response["success"] = 0;
-            $response["message"] = "password incorrect";
+            $response["message"] = "Mot de passe invalide";
         }
 
 
     }else{
             $response["success"] = 0;
-            $response["message"] = "email incorrect";
+            $response["message"] = "Adresse e-mail invalide";
         }
 
 

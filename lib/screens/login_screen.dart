@@ -20,7 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     emailController = TextEditingController();
     passwordController = TextEditingController();
-    
   }
 
   @override
@@ -57,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 40),
 
               SizedBox(
-                width: 100,
+                width: 150,
                 child: ElevatedButton(
                   child: const Text("Se connecter"),
                   onPressed: () async {
@@ -72,21 +71,35 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       );
 
-                      
                       var data = json.decode(response.body);
 
                       if (data['success'] == 1) {
-                        
                         String role = data['data'][0]['role'];
-                        //var d = data['data'];
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
 
-                        // 2. Save the user's data locally (THIS IS YOUR "SESSION")
                         await prefs.setBool('isLoggedIn', true);
                         await prefs.setString(
-                          'userId',data['data'][0]['id'].toString(),
+                          'userId',
+                          data['data'][0]['id'].toString(),
                         );
                         await prefs.setString('userRole', role);
+
+                        // --- CORRECTION ICI ---
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Connexion réussie !",
+                            ), // Message de succès en français
+                            backgroundColor: Colors.green,
+                            duration: Duration(milliseconds: 800),
+                          ),
+                        );
+
+                        await Future.delayed(const Duration(seconds: 1));
+
+                        // Vérification de sécurité
+                        if (!mounted) return;
 
                         if (role == 'admin') {
                           Navigator.pushReplacementNamed(
@@ -98,15 +111,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushReplacementNamed(
                             context,
                             '/enseignant_home',
-                           
                           );
                         } else {
                           Navigator.pushReplacementNamed(
                             context,
                             '/etudiant_home',
-                       
                           );
                         }
+                        // -----------------------
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(data['message'])),
@@ -114,8 +126,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("erreur: cannot connect to server "),
+                        const SnackBar(
+                          content: Text(
+                            "Erreur : impossible de se connecter au serveur",
+                          ),
                         ),
                       );
                     }
@@ -135,6 +149,3 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 }
-
-
-

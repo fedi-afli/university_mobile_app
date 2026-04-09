@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:projet_mobile/models/enseignant.dart';
 import 'package:projet_mobile/screens/admin/enseignants_screen.dart';
 import 'package:projet_mobile/screens/admin/seances_screen.dart';
-
-import 'package:projet_mobile/screens/enseignant/enseignant_home.dart';
+import 'package:projet_mobile/screens/edudiant/etudiant_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin/admin_home.dart';
 import 'screens/admin/etudiants_screen.dart';
 import 'screens/admin/classes_screen.dart';
 import 'models/etudiant.dart';
+import 'screens/edudiant/etudiant_home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -127,7 +127,7 @@ class MyApp extends StatelessWidget {
             height: 1.4,
           ),
         ),
-      ),
+      ),  
       initialRoute: '/',
 
       routes: {
@@ -145,8 +145,6 @@ class MyApp extends StatelessWidget {
           child: Scaffold(body: Center(child: Text("Enseignant Home"))),
           roleRequired: "enseignant",
         ),
-        '/enseignant_home': (context) =>
-            const  AuthGuard(child:EnseignantHomeScreen() ,roleRequired: "enseignant",),
         '/etudiant_home': (context) =>
              AuthGuard(child: EtudiantHome(), roleRequired: "etudiant"),
         '/admin_home/ajouter_etudiant': (context) =>
