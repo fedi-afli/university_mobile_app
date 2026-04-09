@@ -1,0 +1,13 @@
+-- ============================================
+-- Données de test
+-- ============================================
+INSERT INTO utilisateurs (nom,prenom,email,password,role) VALUES
+ ('Admin','Système','admin@school.tn','admin123','admin'),
+ ('Ben Ali','Sami','sami@school.tn','prof123','enseignant'),
+ ('Trabelsi','Amine','amine@school.tn','etu123','etudiant');
+INSERT INTO classes (nom,niveau) VALUES ('CI2-A','Cycle Ingénieur 2');
+INSERT INTO matieres (nom) VALUES ('Développement Mobile'),('Réseaux'),('BDD');
+INSERT INTO enseignants (utilisateur_id,specialite) VALUES (2,'Informatique');
+INSERT INTO etudiants (utilisateur_id,classe_id) VALUES (3,1);
+
+flutter run -d chrome --web-port=8080
