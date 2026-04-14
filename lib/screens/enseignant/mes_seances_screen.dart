@@ -30,7 +30,7 @@ class _SeancesScreenState extends State<SeancesScreen> {
               vertical: 15.0,
             ),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
             ),
             child: const Row(
@@ -139,7 +139,6 @@ class _SeancesScreenState extends State<SeancesScreen> {
                     );
                     double difference = fin.difference(debut).inMinutes / 60.0;
                     return Card(
-                      color: seance.appel ? Colors.green.shade100 : Colors.white,
                       margin: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 5,
@@ -177,7 +176,7 @@ class _SeancesScreenState extends State<SeancesScreen> {
                               Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      // On passe l'objet seance actuel à l'écran d'appel
+                                     
                                       builder: (context) => AppelScreen(seance: seance),
                                     ),
                                   );

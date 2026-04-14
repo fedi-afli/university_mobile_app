@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:projet_mobile/config/api_config.dart';
+import 'package:projet_mobile/main.dart';
 
 import 'mes_seances_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,12 +60,23 @@ class _EnseignantHomeScreen extends State<EnseignantHomeScreen> {
                         },
                         child: Text('deconnecter'),
                       ),
+                     
                     ],
                   ),
+
                 );
               },
               icon: const Icon(Icons.logout),
             ),
+             IconButton(
+                          icon: const Icon(Icons.brightness_6),
+                          tooltip: 'Changer de thème',
+                          onPressed: () {
+                            themeNotifier.value = themeNotifier.value == ThemeMode.light 
+                                ? ThemeMode.dark 
+                                : ThemeMode.light;
+                          },
+                        ),
           ],
         ),
         body:seances,

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:projet_mobile/config/api_config.dart';
+import 'package:projet_mobile/main.dart';
 import 'package:projet_mobile/models/etudiant.dart';
 import 'package:projet_mobile/models/classe.dart';
 import 'package:projet_mobile/screens/admin/classes_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EtudiantsScreen extends StatefulWidget {
   const EtudiantsScreen({Key? key}) : super(key: key);
@@ -19,14 +21,13 @@ class _EtudiantsScreenState extends State<EtudiantsScreen> {
     return Scaffold(
       body: Column(
         children: [
-          // 1. THE HEADER ROW
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 22.0,
               vertical: 15.0,
             ),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
             ),
             child: const Row(
@@ -40,7 +41,7 @@ class _EtudiantsScreenState extends State<EtudiantsScreen> {
                   ),
                 ),
                 Expanded(
-                  flex: 4,
+                  flex: 3,
                   child: Text(
                     "Nom & Prénom",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -60,6 +61,7 @@ class _EtudiantsScreenState extends State<EtudiantsScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
+                Expanded(flex: 2, child: Text('')),
               ],
             ),
           ),
@@ -122,7 +124,7 @@ class _EtudiantsScreenState extends State<EtudiantsScreen> {
                               // These must match the flex values in the header perfectly!
                               Expanded(flex: 1, child: Text("${etudiant.id}")),
                               Expanded(
-                                flex: 4,
+                                flex: 3,
                                 child: Text(
                                   "${etudiant.nom.toUpperCase()} ${etudiant.prenom}",
                                 ),
@@ -131,6 +133,83 @@ class _EtudiantsScreenState extends State<EtudiantsScreen> {
                               Expanded(
                                 flex: 2,
                                 child: Text(etudiant.classe ?? 'N/A'),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: SizedBox(
+                                  width: 100,
+                                  height: 40,
+                                  child: FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor:
+                                          Colors.red, // 👈 button color
+                                      foregroundColor:
+                                          Colors.white, // 👈 text color
+                                    ),
+
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text('suppression'),
+                                          content: Text(
+                                            "Êtes-vous sûr de vouloir vous supprimer ce ${etudiant.nom} ${etudiant.prenom} ?",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: Text("annuler"),
+                                            ),
+
+                                            FilledButton(
+                                              onPressed: () async {
+                                                try {
+                                                  await deleteEtudiant(
+                                                    etudiant.id,
+                                                  );
+
+                                                  Navigator.pushReplacementNamed(
+                                                    context,
+                                                    '/admin_home',
+                                                    arguments: 0,
+                                                  );
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "etudient supprimer avec success",
+                                                      ),
+                                                    ),
+                                                  );
+                                                } catch (e) {
+                                                  print(e);
+
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Erreur lors de la suppression",
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              child: Text('supprimer'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      "supprimer",
+                                      softWrap: false,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -156,6 +235,23 @@ class _EtudiantsScreenState extends State<EtudiantsScreen> {
       ),
     );
   }
+}
+
+Future<String> deleteEtudiant(int id) async {
+  final response = await http.delete(
+    Uri.parse("$baseUrl/admin/etudiants.php"),
+    body: {'id': id.toString()},
+  );
+
+  if (response.statusCode == 200) {
+    var data = json.decode(response.body);
+    if (data['success'] == 1) {
+      return " etudiant supprimer";
+    } else {
+      return data["message"];
+    }
+  }
+  throw Exception("Impossible de supprimer les étudiants");
 }
 
 Future<List<Etudiant>> getEtudiants() async {
@@ -356,25 +452,24 @@ class _AjouterEtudiantState extends State<AjouterEtudiant> {
                 ),
                 SizedBox(height: 20),
 
-                 DropdownButtonFormField<String>(
-                    value: classe_selectioner, // Initially null
-                    decoration: const InputDecoration(labelText: "Classe"),
-                    validator: (value) {
-                      if (value == null) return "Veuillez choisir une classe";
-                      return null;
-                    },
-                    items: classesList.map<DropdownMenuItem<String>>((c) {
-                      return DropdownMenuItem<String>(
-                        value: c.id.toString(),
-                        child: Text(c.nom),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        classe_selectioner = value;
-                      });
-                    },
-                  
+                DropdownButtonFormField<String>(
+                  value: classe_selectioner, // Initially null
+                  decoration: const InputDecoration(labelText: "Classe"),
+                  validator: (value) {
+                    if (value == null) return "Veuillez choisir une classe";
+                    return null;
+                  },
+                  items: classesList.map<DropdownMenuItem<String>>((c) {
+                    return DropdownMenuItem<String>(
+                      value: c.id.toString(),
+                      child: Text(c.nom),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      classe_selectioner = value;
+                    });
+                  },
                 ),
 
                 SizedBox(height: 30),
@@ -508,14 +603,59 @@ class _ModifierEtudiantState extends State<ModifierEtudiant> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("ScholarCheck"),
+        automaticallyImplyLeading: false,
         leading: IconButton(
-          onPressed: () => Navigator.pushReplacementNamed(
-            context,
-            "/admin_home",
-            arguments: 0,
-          ),
+          onPressed: () =>
+              Navigator.pushReplacementNamed(context, '/admin_home'),
           icon: const Icon(Icons.arrow_back),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Deconnixion'),
+                  content: Text("Êtes-vous sûr de vouloir vous déconnecter ?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("annuler"),
+                    ),
+
+                    FilledButton(
+                      onPressed: () async {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+
+                        prefs.clear();
+
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                      child: Text('deconnecter'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            icon: const Icon(Icons.logout),
+          ),
+          IconButton(
+            icon: const Icon(Icons.brightness_6),
+            tooltip: 'Changer de thème',
+            onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+
+              if (themeNotifier.value == ThemeMode.light) {
+                themeNotifier.value = ThemeMode.dark;
+                await prefs.setBool('getTheme', true);
+              } else {
+                themeNotifier.value = ThemeMode.light;
+                await prefs.setBool('getTheme', false);
+              }
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Padding(
@@ -636,28 +776,25 @@ class _ModifierEtudiantState extends State<ModifierEtudiant> {
                 ),
                 SizedBox(height: 20),
 
-                
-                  
-                   DropdownButtonFormField<String>(
-                    value: classe_selectioner,
-                    decoration: const InputDecoration(labelText: "Classe"),
-                    validator: (value) {
-                      if (value == null) return "Veuillez choisir une classe";
-                      return null;
-                    },
-                    items: classesList.map<DropdownMenuItem<String>>((c) {
-                      return DropdownMenuItem<String>(
-                        value: c.id.toString(),
-                        child: Text(c.nom),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        classe_selectioner = value;
-                      });
-                    },
-                  ),
-                
+                DropdownButtonFormField<String>(
+                  value: classe_selectioner,
+                  decoration: const InputDecoration(labelText: "Classe"),
+                  validator: (value) {
+                    if (value == null) return "Veuillez choisir une classe";
+                    return null;
+                  },
+                  items: classesList.map<DropdownMenuItem<String>>((c) {
+                    return DropdownMenuItem<String>(
+                      value: c.id.toString(),
+                      child: Text(c.nom),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      classe_selectioner = value;
+                    });
+                  },
+                ),
 
                 SizedBox(height: 30),
 

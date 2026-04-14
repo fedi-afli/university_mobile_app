@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:projet_mobile/models/enseignant.dart';
 import 'package:projet_mobile/screens/admin/enseignants_screen.dart';
 import 'package:projet_mobile/screens/admin/seances_screen.dart';
-import 'package:projet_mobile/screens/edudiant/etudiant_home.dart';
+import 'package:projet_mobile/screens/etudiant/etudiant_home.dart';
+import 'package:projet_mobile/screens/enseignant/enseignant_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin/admin_home.dart';
 import 'screens/admin/etudiants_screen.dart';
 import 'screens/admin/classes_screen.dart';
 import 'models/etudiant.dart';
-import 'screens/edudiant/etudiant_home.dart';
+import 'screens/etudiant/etudiant_home.dart';
+
+final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
 void main() {
   runApp(const MyApp());
@@ -20,164 +23,299 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ScholarCheck',
-      theme: ThemeData(
-        useMaterial3: true,
-        
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF059669),      // Deep Emerald Green
-          onPrimary: Colors.white,
-          secondary: Color(0xFF2563EB),    // Royal Blue
-          onSecondary: Colors.white,
-          surface: Colors.white,
-          onSurface: Color(0xFF1E293B),    // Dark Slate text
-          background: Color(0xFFF8FAFC),
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+    // ValueListenableBuilder écoute les changements de thème
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (_, ThemeMode currentMode, __) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'ScholarCheck',
+          themeMode: currentMode,
 
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF059669),
-          foregroundColor: Colors.white,
-          centerTitle: true,
-          elevation: 0,
-          titleTextStyle: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-          ),
-        ),
-
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF059669),
-            foregroundColor: Colors.white,
-            elevation: 2,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            minimumSize: const Size(120, 48),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF059669), // Deep Emerald Green
+              onPrimary: Colors.white,
+              secondary: Color(0xFF2563EB), // Royal Blue
+              onSecondary: Colors.white,
+              surface: Colors.white,
+              onSurface: Color(0xFF1E293B), 
+              // Dark Slate text
             ),
-            textStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+            scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF059669),
+              foregroundColor: Colors.white,
+              centerTitle: true,
+              elevation: 0,
+              titleTextStyle: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF059669),
+                foregroundColor: Colors.white,
+                elevation: 2,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 24,
+                ),
+                minimumSize: const Size(120, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF059669),
+                  width: 2,
+                ),
+              ),
+              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+            ),
+
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: Colors.white,
+              selectedItemColor: Color(0xFF059669),
+              unselectedItemColor: Color(0xFF94A3B8),
+              showUnselectedLabels: true,
+              type: BottomNavigationBarType.fixed,
+              elevation: 12,
+              selectedLabelStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+
+            cardTheme: CardThemeData(
+              color: Colors.white,
+              elevation: 4,
+              shadowColor: const Color(0xFF059669).withOpacity(0.15),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+              ),
+              clipBehavior: Clip.antiAlias,
+            ),
+
+            listTileTheme: const ListTileThemeData(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              iconColor: Color(0xFF059669),
+              tileColor: Colors.transparent,
+              titleTextStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1E293B),
+              ),
+              subtitleTextStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF64748B),
+                height: 1.4,
+              ),
             ),
           ),
-        ),
 
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF059669), width: 2),
-          ),
-          hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-        ),
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            colorScheme: const ColorScheme.dark(
+              primary: Color(0xFF059669),      
+              onPrimary: Colors.white,
+              secondary: Color(0xFF3B82F6),    
+              onSecondary: Colors.white,
+              surface: Color(0xFF1E293B),      
+              onSurface: Colors.white,         
+              surfaceContainerHighest: const Color(0xFF0F172A),
+            ),
+            scaffoldBackgroundColor: const Color(0xFF0F172A), 
+            
+      
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF059669), 
+              foregroundColor: Colors.white,
+              centerTitle: true,
+              elevation: 0,
+              titleTextStyle: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF059669),
+                foregroundColor: Colors.white,
+                elevation: 2,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 24,
+                ),
+                minimumSize: const Size(120, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
 
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
-          selectedItemColor: Color(0xFF059669),
-          unselectedItemColor: Color(0xFF94A3B8), 
-          showUnselectedLabels: true,
-          type: BottomNavigationBarType.fixed,
-          elevation: 12,
-          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-        ),
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              fillColor: const Color(0xFF1E293B), // Champs gris foncé
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF334155)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF334155)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF059669),
+                  width: 2,
+                ),
+              ),
+              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+            ),
 
-        cardTheme: CardThemeData(
-          color: Colors.white,
-          elevation: 4, // Slightly higher elevation
-          shadowColor: const Color(0xFF059669).withOpacity(0.15), // A subtle emerald-tinted shadow
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(
-              color: Color(0xFFE2E8F0), // Very faint slate border to frame the content
-              width: 1,
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: Color(0xFF1E293B),
+              selectedItemColor: Color(
+                0xFF10B981,
+              ), // Émeraude légèrement plus clair
+              unselectedItemColor: Color(0xFF64748B),
+              showUnselectedLabels: true,
+              type: BottomNavigationBarType.fixed,
+              elevation: 12,
+              selectedLabelStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+
+            cardTheme: CardThemeData(
+              color: const Color(0xFF1E293B),
+              elevation: 4,
+              shadowColor: Colors.black.withOpacity(0.3),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(
+                  color: Color(0xFF334155), // Bordure discrète
+                  width: 1,
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+            ),
+
+            listTileTheme: const ListTileThemeData(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              iconColor: Color(0xFF10B981),
+              tileColor: Colors.transparent,
+              titleTextStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+              subtitleTextStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF94A3B8),
+                height: 1.4,
+              ),
             ),
           ),
-          clipBehavior: Clip.antiAlias, // Ensures list items don't bleed out of the rounded corners
-        ),
 
-        // 7. NEW: ListTile Theme (Makes the text and icons inside lists look premium)
-        listTileTheme: ListTileThemeData(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8), // Better breathing room
-          iconColor: const Color(0xFF059669), // Makes leading/trailing icons Emerald automatically
-          tileColor: Colors.transparent,
-          titleTextStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600, // Bolder titles for names/classes
-            color: Color(0xFF1E293B),    // Dark slate
-          ),
-          subtitleTextStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: Color(0xFF64748B),    // Lighter slate for secondary info
-            height: 1.4,
-          ),
-        ),
-      ),  
-      initialRoute: '/',
+          initialRoute: '/',
 
-      routes: {
-        '/': (context) => const sessionScreen(),
-        '/login': (context) => const LoginScreen(),
+          routes: {
+            '/': (context) => const sessionScreen(),
+            '/login': (context) => const LoginScreen(),
 
-        '/admin_home': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as int?;
-          return AuthGuard(
-            child: AdminHomeScreen(initialIndex: args ?? 0),
-            roleRequired: "admin",
-          );
-        },
-        '/enseignant_home': (context) => const AuthGuard(
-          child: Scaffold(body: Center(child: Text("Enseignant Home"))),
-          roleRequired: "enseignant",
-        ),
-        '/etudiant_home': (context) =>
-             AuthGuard(child: EtudiantHome(), roleRequired: "etudiant"),
-        '/admin_home/ajouter_etudiant': (context) =>
-            const AuthGuard(child: AjouterEtudiant(), roleRequired: "admin"),
-        '/admin_home/ajouter_enseignant': (context) =>
-            const AuthGuard(child: AjouterEnseignant(), roleRequired: "admin"),
+            '/admin_home': (context) {
+              final args = ModalRoute.of(context)!.settings.arguments as int?;
+              return AuthGuard(
+                child: AdminHomeScreen(initialIndex: args ?? 0),
+                roleRequired: "admin",
+              );
+            },
+            '/enseignant_home': (context) => const AuthGuard(
+              child: EnseignantHomeScreen(),
+              roleRequired: "enseignant",
+            ),
+            '/etudiant_home': (context) => const AuthGuard(
+              child: EtudiantHome(),
+              roleRequired: "etudiant",
+            ),
+            '/admin_home/ajouter_etudiant': (context) => const AuthGuard(
+              child: AjouterEtudiant(),
+              roleRequired: "admin",
+            ),
+            '/admin_home/ajouter_enseignant': (context) => const AuthGuard(
+              child: AjouterEnseignant(),
+              roleRequired: "admin",
+            ),
 
-        '/admin_home/ajouter_classe': (context) =>
-            const AuthGuard(child: AjouterClass(), roleRequired: "admin"),
-        '/admin_home/modifier_etudiant': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Etudiant;
-
-          return AuthGuard(
-            child: ModifierEtudiant(selectionner: args),
-            roleRequired: "admin",
-          );
-        },
-        '/admin_home/modifier_enseignant': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Enseignant;
-
-          return AuthGuard(
-            child: ModifierEnseignant(selectionner: args),
-            roleRequired: "admin",
-          );
-        },
-        "/admin_home/Formulaire_affectation": (context) =>
-            AuthGuard(child: AjouterSeance(), roleRequired: "admin"),
-      },
-      /* onGenerateRoute: (settings) {
-  return MaterialPageRoute(
-    builder: (context) => RouteGuard(settings: settings),
+            '/admin_home/ajouter_classe': (context) =>
+                const AuthGuard(child: AjouterClass(), roleRequired: "admin"),
+            '/admin_home/modifier_etudiant': (context) {
+              final args =
+                  ModalRoute.of(context)!.settings.arguments as Etudiant;
+              return AuthGuard(
+                child: ModifierEtudiant(selectionner: args),
+                roleRequired: "admin",
+              );
+            },
+            '/admin_home/modifier_enseignant': (context) {
+              final args =
+                  ModalRoute.of(context)!.settings.arguments as Enseignant;
+              return AuthGuard(
+                child: ModifierEnseignant(selectionner: args),
+                roleRequired: "admin",
+              );
+            },
+            "/admin_home/Formulaire_affectation": (context) =>
+                const AuthGuard(child: AjouterSeance(), roleRequired: "admin"),
+          },
         );
-      }, */
+      },
     );
   }
 }
@@ -199,9 +337,14 @@ class _sessionScreen extends State<sessionScreen> {
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    bool isdark = prefs.getBool('getTheme') ?? false;
 
-    // Small delay so the screen doesn't instantly flash
     await Future.delayed(const Duration(milliseconds: 500));
+    if (isdark) {
+      themeNotifier.value = ThemeMode.dark;
+    } else {
+      themeNotifier.value = ThemeMode.light;
+    }
 
     if (isLoggedIn) {
       String? role = prefs.getString('userRole');
@@ -222,9 +365,7 @@ class _sessionScreen extends State<sessionScreen> {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Color(0xFF059669), // Updated to Emerald Green
-      body: Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
+      body: Center(child: CircularProgressIndicator(color: Colors.white)),
     );
   }
 
@@ -273,106 +414,3 @@ class AuthGuard extends StatelessWidget {
     );
   }
 }
-/* class RouteGuard extends StatelessWidget { 
-  final RouteSettings settings;
-
-  const RouteGuard({super.key, required this.settings});
-
-  Future<Widget> _checkAccess() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    String? role = prefs.getString('userRole');
-
-    String route = settings.name ?? '/';
-
-    
-    if (!isLoggedIn && route != '/login') {
-      return const LoginScreen();
-    }
-
-    if (route.startsWith('/admin') && role != 'admin') {
-      return _unauthorized();
-    }
-
-    if (route.startsWith('/enseignant') && role != 'enseignant') {
-      return _unauthorized();
-    }
-
-    if (route.startsWith('/etudiant') && role != 'etudiant') {
-      return _unauthorized();
-    }
-
-    return _getPage(route);
-  }
-
-  Widget _unauthorized() {
-    return const Scaffold(
-      body: Center(child: Text("Unauthorized Access")),
-    );
-  }
-
-  Widget _getPage(String route) {
-    switch (route) {
-      case '/':
-        return const sessionScreen();
-
-      case '/login':
-        return const LoginScreen();
-
-      case '/admin_home':
-        final args = settings.arguments as int?;
-        return AdminHomeScreen(initialIndex: args ?? 0);
-
-      case '/enseignant_home':
-        return const Scaffold(body: Center(child: Text("Enseignant Home")));
-
-      case '/etudiant_home':
-        return const Scaffold(body: Center(child: Text("Etudiant Home")));
-
-      case '/admin_home/ajouter_etudiant':
-        return const AjouterEtudiant();
-
-      case '/admin_home/ajouter_enseignant':
-        return const AjouterEnseignant();
-
-      case '/admin_home/ajouter_classe':
-        return const AjouterClass();
-
-      case '/admin_home/modifier_etudiant':
-        final args = settings.arguments as Etudiant;
-        return ModifierEtudiant(selectionner: args);
-
-      case '/admin_home/modifier_enseignant':
-        final args = settings.arguments as Enseignant;
-        return ModifierEnseignant(selectionner: args);
-
-      case "/admin_home/Formulaire_affectation":
-        return const AjouterSeance();
-
-      default:
-        return const Scaffold(
-          body: Center(child: Text("Page not found")),
-        );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<Widget>(
-      future: _checkAccess(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(
-            backgroundColor: Color(0xFF0C9C34),
-            body: Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
-          );
-        }
-        return snapshot.data!;
-      },
-    );
-  }
-}
-*/

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:projet_mobile/config/api_config.dart';
+import 'package:projet_mobile/main.dart';
 import 'package:projet_mobile/screens/admin/classes_screen.dart';
 import 'package:projet_mobile/screens/admin/enseignants_screen.dart';
 import 'package:projet_mobile/screens/admin/etudiants_screen.dart';
@@ -45,36 +46,50 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
           IconButton(
             onPressed: () {
               showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Deconnixion'),
-                    content: Text(
-                      "Êtes-vous sûr de vouloir vous déconnecter ?",
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Deconnixion'),
+                  content: Text("Êtes-vous sûr de vouloir vous déconnecter ?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("annuler"),
                     ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("annuler"),
-                      ),
 
-                      FilledButton(
-                        onPressed: () async {
-                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                    FilledButton(
+                      onPressed: () async {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
 
-                            prefs.clear();
+                        prefs.clear();
 
-                            Navigator.pushReplacementNamed(context, "/");},
-                        child: Text('deconnecter'),
-                      ),
-                    ],
-                  ),
-                );
-
-
-
-              
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                      child: Text('deconnecter'),
+                    ),
+                  ],
+                ),
+              );
             },
             icon: const Icon(Icons.logout),
+          ),
+          IconButton(
+            icon: const Icon(Icons.brightness_6),
+            tooltip: 'Changer de thème',
+            onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                        
+              if (themeNotifier.value == ThemeMode.light) {
+                themeNotifier.value = ThemeMode.dark;
+                await prefs.setBool('getTheme', true);
+              }
+              else{
+                themeNotifier.value = ThemeMode.light;
+                await prefs.setBool('getTheme', false);
+              }
+              
+            },
           ),
         ],
       ),

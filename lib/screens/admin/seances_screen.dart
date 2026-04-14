@@ -29,7 +29,7 @@ class _SeancesScreenState extends State<SeancesScreen> {
               vertical: 15.0,
             ),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
             ),
             child: const Row(
@@ -192,10 +192,8 @@ class _SeancesScreenState extends State<SeancesScreen> {
 String formatTime(String rawTime) {
   if (rawTime.isEmpty) return "";
 
-  // 1. If there's a date attached (e.g., "2000-01-01 08:00:00.000"), split and take just the time part
   String timePart = rawTime.contains(' ') ? rawTime.split(' ')[1] : rawTime;
 
-  // 2. Take only the first 5 characters (HH:MM) and ignore the seconds/milliseconds
   return timePart.length >= 5 ? timePart.substring(0, 5) : timePart;
 }
 

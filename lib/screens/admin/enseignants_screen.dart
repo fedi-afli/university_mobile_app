@@ -32,7 +32,7 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
               vertical: 15.0,
             ),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
             ),
             child: const Row(
@@ -53,7 +53,7 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                   ),
                 ),
                 Expanded(
-                  flex: 4,
+                  flex: 3,
                   child: Text(
                     "Email",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -66,6 +66,7 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
+                Expanded(flex: 2, child: Text('')),
               ],
             ),
           ),
@@ -130,12 +131,90 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                                   "${enseignant.nom.toUpperCase()} ${enseignant.prenom}",
                                 ),
                               ),
-                              Expanded(flex: 4, child: Text(enseignant.email)),
+                              Expanded(flex: 3, child: Text(enseignant.email)),
                               Expanded(
                                 flex: 3,
                                 child: Text("${enseignant.specialite}"),
                               ),
+                              Expanded(
+                                flex: 2,
+                                child: SizedBox(
+                                  width: 100,
+                                  height: 40,
+                                  child: FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor:
+                                          Colors.red, // 👈 button color
+                                      foregroundColor:
+                                          Colors.white, // 👈 text color
+                                    ),
+
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text('suppression'),
+                                          content: Text(
+                                            "Êtes-vous sûr de vouloir vous supprimer ${enseignant.nom} ${enseignant.prenom} ?",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: Text("annuler"),
+                                            ),
+
+                                            FilledButton(
+                                              onPressed: () async {
+                                                try {
+                                                  await deleteEnseignant(
+                                                    enseignant.id,
+                                                  );
+
+                                                  Navigator.pushReplacementNamed(
+                                                    context,
+                                                    '/admin_home',
+                                                    arguments: 1,
+                                                  );
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "enseignant supprimer avec success",
+                                                      ),
+                                                    ),
+                                                  );
+                                                } catch (e) {
+                                                  print(e);
+
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Erreur lors de la suppression",
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              child: Text('supprimer'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      "supprimer",
+                                      softWrap: false,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
+                            
                           ),
                         ),
                       ),
@@ -149,6 +228,23 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
       ),
     );
   }
+}
+
+Future<String> deleteEnseignant(int id) async {
+  final response = await http.delete(
+    Uri.parse("$baseUrl/admin/enseignants.php"),
+    body: {'id': id.toString()},
+  );
+
+  if (response.statusCode == 200) {
+    var data = json.decode(response.body);
+    if (data['success'] == 1) {
+      return " etudiant supprimer";
+    } else {
+      return data["message"];
+    }
+  }
+  throw Exception("Impossible de supprimer les étudiants");
 }
 
 Future<List<Enseignant>> getdata() async {

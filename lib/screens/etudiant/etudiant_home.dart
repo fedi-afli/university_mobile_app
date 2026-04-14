@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'absences_screen.dart';
 import 'profil_screen.dart';
+import 'package:projet_mobile/main.dart';
 
 class EtudiantHome extends StatefulWidget {
   final int initialIndex;
@@ -57,6 +58,24 @@ class _EtudiantHomeState extends State<EtudiantHome> {
               );
             },
             icon: const Icon(Icons.logout),
+          ),
+           IconButton(
+            icon: const Icon(Icons.brightness_6),
+            tooltip: 'Changer de thème',
+            onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                        
+              if (themeNotifier.value == ThemeMode.light) {
+                themeNotifier.value = ThemeMode.dark;
+                await prefs.setBool('getTheme', true);
+              }
+              else{
+                themeNotifier.value = ThemeMode.light;
+                await prefs.setBool('getTheme', false);
+              }
+              
+            },
           ),
         ],
       ),

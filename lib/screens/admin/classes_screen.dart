@@ -27,7 +27,7 @@ class _classesScreenState extends State<ClassesScreen> {
               vertical: 15.0,
             ),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
             ),
             child: const Row(
