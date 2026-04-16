@@ -84,8 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           data['data'][0]['id'].toString(),
                         );
                         await prefs.setString('userRole', role);
-
-                   
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(

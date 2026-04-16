@@ -12,15 +12,57 @@ class ClassesScreen extends StatefulWidget {
 }
 
 class _classesScreenState extends State<ClassesScreen> {
+  late List<Classe> allClasses ;
+  late List<Classe> filteredClasses ;
+  late  TextEditingController searchController;
+
+  @override
+  void initState() {
+    
+    super.initState();
+    allClasses = [];
+    filteredClasses = [];
+    searchController = TextEditingController();
+  }
+
+
+  void _filterClasses(String query) {
+    setState(() {
+      filteredClasses = allClasses.where((classe) {
+        final q = query.toLowerCase();
+        return classe.nom.toLowerCase().contains(q);
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed:()=> Navigator.pushReplacementNamed(context,"/admin_home/ajouter_classe",arguments: 2),
-      child: Icon(Icons.add),
-      tooltip: 'ajouter classe',),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushReplacementNamed(
+          context,
+          "/admin_home/ajouter_classe",
+          arguments: 2,
+        ),
+        child: Icon(Icons.add),
+        tooltip: 'ajouter classe',
+      ),
       body: Column(
         children: [
-          // 1. THE HEADER ROW
+           Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: _filterClasses,
+              decoration: InputDecoration(
+                hintText: "Rechercher...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 22.0,
@@ -64,9 +106,13 @@ class _classesScreenState extends State<ClassesScreen> {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
+                if(allClasses.isEmpty){
+                  allClasses = snapshot.data as List<Classe>;
+                  filteredClasses = allClasses;
+                }
 
-                var list = snapshot.data as List<Classe>;
-                if (list.length == 0) {
+                
+                if (filteredClasses.length == 0) {
                   return Scaffold(
                     body: Center(
                       child: Padding(
@@ -90,9 +136,9 @@ class _classesScreenState extends State<ClassesScreen> {
                 }
 
                 return ListView.builder(
-                  itemCount: list.length,
+                  itemCount: filteredClasses.length,
                   itemBuilder: (context, index) {
-                    Classe classe = list[index];
+                    Classe classe = filteredClasses[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 10,

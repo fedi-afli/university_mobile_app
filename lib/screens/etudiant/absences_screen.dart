@@ -24,6 +24,8 @@ class _AbsenceScreenState extends State<AbsenceScreen> {
   }
 
   Future<List<dynamic>> fetchAbsences() async {
+
+
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
 

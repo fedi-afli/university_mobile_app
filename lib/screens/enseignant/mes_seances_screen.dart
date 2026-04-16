@@ -18,12 +18,46 @@ class SeancesScreen extends StatefulWidget {
 }
 
 class _SeancesScreenState extends State<SeancesScreen> {
+  late List<Seance> allEtu;
+  late List<Seance> filteredEtu;
+  late TextEditingController searchController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    allEtu = [];
+    filteredEtu = [];
+    searchController = TextEditingController();
+  }
+    void _filterEnseignants(String query) {
+    setState(() {
+      filteredEtu = allEtu.where((enseignant) {
+        final q = query.toLowerCase();
+        return enseignant.classe.toLowerCase().contains(q) ||
+            enseignant.matiere.toLowerCase().contains(q);
+      }).toList();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          // 1. THE HEADER ROW
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: _filterEnseignants,
+              decoration: InputDecoration(
+                hintText: "Rechercher...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 22.0,
@@ -102,9 +136,14 @@ class _SeancesScreenState extends State<SeancesScreen> {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
+                 if (allEtu.isEmpty) {
+                  allEtu = snapshot.data as List<Seance>;
+                  filteredEtu = allEtu;
+                }
 
-                var list = snapshot.data as List<Seance>;
-                if (list.length == 0) {
+
+               
+                if (filteredEtu.length == 0) {
                   return Scaffold(
                     body: Center(
                       child: Padding(
@@ -128,9 +167,9 @@ class _SeancesScreenState extends State<SeancesScreen> {
                 }
 
                 return ListView.builder(
-                  itemCount: list.length,
+                  itemCount: filteredEtu.length,
                   itemBuilder: (context, index) {
-                    Seance seance = list[index];
+                    Seance seance = filteredEtu[index];
                     DateTime debut = DateTime.parse(
                       "2000-01-01 ${seance.heureDebut}",
                     );

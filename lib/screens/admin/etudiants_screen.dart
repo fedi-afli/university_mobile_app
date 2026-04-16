@@ -16,11 +16,48 @@ class EtudiantsScreen extends StatefulWidget {
 }
 
 class _EtudiantsScreenState extends State<EtudiantsScreen> {
+
+  late List<Etudiant> allEtu;
+  late List<Etudiant> filteredEtu;
+  late TextEditingController searchController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    allEtu = [];
+    filteredEtu = [];
+    searchController = TextEditingController();
+  }
+
+  void _filterEnseignants(String query) {
+    setState(() {
+      filteredEtu = allEtu.where((enseignant) {
+        final q = query.toLowerCase();
+        return enseignant.nom.toLowerCase().contains(q) ||
+            enseignant.prenom.toLowerCase().contains(q);
+      }).toList();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
+           Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: _filterEnseignants,
+              decoration: InputDecoration(
+                hintText: "Rechercher...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 22.0,
@@ -73,8 +110,13 @@ class _EtudiantsScreenState extends State<EtudiantsScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
+                 if (allEtu.isEmpty) {
+                  allEtu = snapshot.data as List<Etudiant>;
+                  filteredEtu = allEtu;
+                }
+
                 var list = snapshot.data as List<Etudiant>;
-                if (list.length == 0) {
+                if (filteredEtu.length == 0) {
                   return Scaffold(
                     body: Center(
                       child: Padding(
@@ -98,9 +140,9 @@ class _EtudiantsScreenState extends State<EtudiantsScreen> {
                 }
 
                 return ListView.builder(
-                  itemCount: list.length,
+                  itemCount: filteredEtu.length,
                   itemBuilder: (context, index) {
-                    Etudiant etudiant = list[index];
+                    Etudiant etudiant = filteredEtu[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 10,

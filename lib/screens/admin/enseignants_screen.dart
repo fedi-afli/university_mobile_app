@@ -12,6 +12,29 @@ class EnseignantsScreen extends StatefulWidget {
 }
 
 class _EnseignantsScreenState extends State<EnseignantsScreen> {
+  late List<Enseignant> allEnseignants;
+  late List<Enseignant> filteredEnseignants;
+  late TextEditingController searchController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    allEnseignants = [];
+    filteredEnseignants = [];
+    searchController = TextEditingController();
+  }
+
+  void _filterEnseignants(String query) {
+    setState(() {
+      filteredEnseignants = allEnseignants.where((enseignant) {
+        final q = query.toLowerCase();
+        return enseignant.nom.toLowerCase().contains(q) ||
+            enseignant.prenom.toLowerCase().contains(q);
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +48,20 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
       ),
       body: Column(
         children: [
-          // 1. THE HEADER ROW
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: _filterEnseignants,
+              decoration: InputDecoration(
+                hintText: "Rechercher...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 22.0,
@@ -78,8 +114,13 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                var list = snapshot.data as List<Enseignant>;
-                if (list.length == 0) {
+                if (allEnseignants.isEmpty) {
+                  allEnseignants = snapshot.data as List<Enseignant>;
+                  filteredEnseignants = allEnseignants;
+                }
+
+               
+                if (filteredEnseignants.length == 0) {
                   return Scaffold(
                     body: Center(
                       child: Padding(
@@ -103,9 +144,9 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                 }
 
                 return ListView.builder(
-                  itemCount: list.length,
+                  itemCount: filteredEnseignants.length,
                   itemBuilder: (context, index) {
-                    Enseignant enseignant = list[index];
+                    Enseignant enseignant = filteredEnseignants[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -214,7 +255,6 @@ class _EnseignantsScreenState extends State<EnseignantsScreen> {
                                 ),
                               ),
                             ],
-                            
                           ),
                         ),
                       ),
@@ -695,7 +735,6 @@ class _ModifierEnseignantState extends State<ModifierEnseignant> {
 
                 Center(
                   child: ElevatedButton(
-                    
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         var url = Uri.parse("$baseUrl/admin/enseignants.php");
